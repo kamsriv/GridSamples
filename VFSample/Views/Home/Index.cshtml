@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<!--column re ordering https://github.com/tabalinas/jsgrid/issues/17-->
+<div class="text-center">
+    <h4>Welcome - JS Grid demo with data geo JSON</h4>
+</div>
+<a href="/data_geo.json">json file</a>
+<div class="config-panel">
+    <label>Columns</label>
+    <select id="fieldNames" onchange="toggleColumn(this)"></select>
+</div>
+
+
+<div id="jsGrid">
+
+</div>
+
+<script>
+    function toggleColumn(obj) {
+        let opt = $("#fieldNames").find(":selected");
+        console.log($(opt).val()+"-"+$(opt).attr("visibility"));
+        $("#jsGrid").jsGrid("fieldOption", $(obj).val(), "visible", $(opt).attr("visibility") !== "true");
+        !$(opt).attr("visibility", $(opt).attr("visibility")!=="true");
+    }
+
+   $(document).ready(function(){
+        $.ajax({
+            url: "data_geo.json",
+            dataType: "json"
+        })
+            .done(function (dataArray) {
+                $("#jsGrid").jsGrid({
+                    height: "auto",
+                    width: "100%",
+                    autoload: true,
+                    paging: true,
+                    pageSize: 100,
+                    sorting: true,
+                    paging: true,
+                    data: dataArray.venues,
+                    fields: [
+                        { name: "id", title: "GridValue", type: "number", width: 50 },
+                        { name: "category", title: "Category Name", type: "text", width: 50,  },
+                        { name: "name", title:"Geo Name", type: "text", width: 150 },
+                        {
+                            name: "created_on", title: "Created", type: "date", width: 100, cellRenderer: function (value, item) {
+                                return $("<td>").addClass("text-warning").append($("<p>").text(new Date(value).toLocaleDateString()))
+                            }
+                        },
+                        {
+                            name: "geolocation_degrees", title: "Geo Loc", type: "text", width: 200
+                        }
+                    ],
+                    onRefreshed: function (e) {
+                        var $headerRow = $("#jsGrid .jsgrid-header-row");
+                        var $headerCells = $headerRow.find("th");
+                        var fields = e.grid.option("fields");
+                        
+                        $.each(fields, function (index, field) {
+                            $headerCells.eq(index).data("JSField", field);
+                        });
+
+                        $headerRow.sortable({
+                            axis: "x",
+                            placeholder: "header-cell-placeholder",
+                            start: function (e, ui) {
+                                ui.placeholder.width(ui.helper.width());
+                            },
+                            update: function (e, ui) {
+                                var fields = $.map($headerRow.find("th"), function (cell) {
+                                    return $(cell).data("JSField");
+                                });
+
+                                $("#jsGrid").jsGrid("option", "fields", fields);
+                            }
+                        });
+                    }
+                });
+            });
+        
+        
+
+
+        ["id", "category", "name", "created_on", "geolocation_degrees"].forEach(function (obj, i) {
+            $("#fieldNames").append($("<option>", { value: i, text: obj, visibility: true }).append("<input>", { type: "checkbox" }));
+        })
+        
+   });
+   function formatJSGridColumn(dataType, format, value)
+   {
+       
+       if(dataType == "number"){
+           return value.toFixed(format.replace('N',''));
+       }else if(dataType == "date"){
+           return value.to
+       }
+   }
+</script>

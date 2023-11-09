@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jsgrid@1.5.3",
+      "destination": "wwwroot/lib/jsgrid/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "bootstrap-table@1.22.1",
+      "destination": "wwwroot/lib/bootstrap-table/"
+    }
+  ,
+{
+  "provider": "cdnjs",
+  "library": "gridjs@6.0.6",
+  "destination": "wwwroot/lib/gridjs/"
+}
+]
+}

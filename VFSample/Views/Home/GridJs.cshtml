@@ -1,0 +1,46 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout";
+}
+<script type="module">
+    import {
+        Grid,
+        html
+    } from "https://unpkg.com/gridjs?module";
+
+</script>
+<table id="table"></table>
+<script>
+    var t = ["one", "two", "three", "Apple", "Banana", "Mango"];
+    [number1, number2, number3, ...fruits] = t; //destructuring of the array
+
+
+    new Grid({
+        columns: ['Name', 'Email'],
+        data: [
+            ['John', 'john@example.com'],
+            ['Mike', 'mike@gmail.com']
+        ]
+    }).render(document.getElementById('table'));
+    /*
+    $(document).ready(function () {
+        $.ajax({
+            url: "/data_geo.json",
+            dataType: "json"
+        })
+            .done(function (dataArray) {
+            const grid =  new Grid({
+                    columns: [
+                        { name: "id", type: "text", width: 50, sort: true },
+                        { name: "category", type: "text", width: 50, sort: true },
+                        { name: "name", type: "text", width: 150, sort: true },
+                        { name: "created_on", type: "date", width: 100, sort: true },
+                        { name: "geolocation_degrees", type: "text", width: 200, sort: true }
+                    ],
+                    data: dataArray.venues
+                }).render(document.getElementById('table'));;
+            });
+    });*/
+</script>

@@ -1,0 +1,41 @@
+﻿@model GeoModalData
+@{
+    ViewData["Title"] = "Home Page";
+}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+
+<div class="text-center">
+    <h4>Welcome - DataTables demo with data geo JSON</h4>
+</div>
+@if (Model.Venues == null)
+    return;
+<a href="/data_geo.json">json file</a>
+<table id="myTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Id</th>
+            <th>Category</th>
+            <td>Created On</td>
+            <td>Geo Location</td>
+        </tr>
+    </thead>
+    <tbody>
+@foreach(var v in Model.Venues)
+{
+    <tr>
+            <td>@v.Name</td>
+            <td>@v.Id</td>
+            <td>@v.Category</td>
+            <td>@v.CreatedOn</td>
+            <td>@v.GeoLocationAddress</td>
+    </tr>
+}
+    </tbody>
+</table>
+<script>
+    let table = new DataTable('#myTable', {
+        // options
+    });
+</script>
