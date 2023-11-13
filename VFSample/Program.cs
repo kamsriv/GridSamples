@@ -25,6 +25,20 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(p => p.MapControllers());
 
+
+app.Use(async (ctx, nxt) => {
+    if (ctx.Session != null && ctx.Session.GetInt32("session::started") == 1)
+    {
+        ctx.Response.Headers.Add("inside", "if session started");
+        await nxt();
+    }
+    else
+    {
+        ctx.Response.Headers.Add("inside", "else session started");
+        ctx.Response.Redirect("\\Auth");
+    }
+});
+
 //app.Use(async (ctx, nxt) =>
 //{
 //    ctx.Session.SetInt32("isMobile", ctx.IsMobileDevice().Item1 ? 1 : 0);

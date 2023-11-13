@@ -15,6 +15,8 @@ namespace VFSample.Controllers
         [Route("GenerateToken")]
         public IActionResult GenerateToken(string un, string pd)
         {
+            //session generation will be done here.
+            HttpContext.Session.SetInt32("session::started", 1);
             return Ok(new { u = un, p = pd });
         }
     }

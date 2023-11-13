@@ -49,6 +49,7 @@
                 </div>
                 <div class="bg-red">
                     Welcome @Context.User?.Identity?.Name
+                    Path is @($"{Context.Request.Scheme}{Context.Request.PathBase}")
                 </div>
             </div>
         </nav>
