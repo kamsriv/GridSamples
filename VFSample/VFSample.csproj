@@ -9,8 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="DeviceDetector.NET" Version="6.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="6.0.20" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

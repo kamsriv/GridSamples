@@ -1,7 +1,12 @@
+using Azure.Core;
+using Azure;
 using DeviceDetectorNET;
 using DeviceDetectorNET.Cache;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
+using System.Text;
 using System.Text.RegularExpressions;
 using YamlDotNet.Serialization.NodeDeserializers;
 
@@ -39,6 +44,30 @@ app.Use(async (ctx, nxt) => {
     }
 });
 
+
+app.Use(async (ctx, nxt) =>{ //basic authentication implementation.
+    var authHeader = ctx.Request.Headers["Authorization"].ToString();
+    if (authHeader != null && authHeader.StartsWith("basic", StringComparison.OrdinalIgnoreCase))
+    {
+        var token = authHeader.Substring("Basic ".Length).Trim();
+        System.Console.WriteLine(token);
+        var credentialstring = Encoding.UTF8.GetString(Convert.FromBase64String(token));
+        var credentials = credentialstring.Split(':');
+        if (credentials[0] == "admin" && credentials[1] == "admin")
+        {
+            var claims = new[] { new Claim("name", credentials[0]), new Claim(ClaimTypes.Role, "Admin") };
+            var identity = new ClaimsIdentity(claims, "Basic");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            return;
+        }
+
+        ctx.Response.StatusCode = 401;
+        ctx.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"dotnetthoughts.net\"");
+        return;// Task.FromResult(AuthenticateResult.Fail("Invalid Authorization Header"));
+    }
+    
+    await nxt(ctx);
+});
 //app.Use(async (ctx, nxt) =>
 //{
 //    ctx.Session.SetInt32("isMobile", ctx.IsMobileDevice().Item1 ? 1 : 0);
