@@ -7,10 +7,12 @@ using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Diagnostics;
+using MyProgram;
 
 namespace VFSample.Controllers
 {
-    [Authorize(AuthenticationSchemes = NegotiateDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = NegotiateDefaults.AuthenticationScheme)]
     public class HomeController : Controller
     {
         public class ABC
@@ -85,7 +87,9 @@ namespace VFSample.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+            //throw new Exception("Exception occurred.. this will take to the error page");
+           return BadRequest("hello this will not good");
+            //return View();
         }
 
         public IActionResult MyAction()
@@ -106,7 +110,9 @@ namespace VFSample.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var exc = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            var url = Context.App.Configuration["AppUrl"];
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier, ErrorMessage = exc?.Error?.Message });
         }
     }
 }
