@@ -15,6 +15,9 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/jsgrid/jsgrid.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        alert(config.basePath);
+    </script>
 </head>
 <body>
     <header>
@@ -67,3 +70,8 @@
     </footer>
 </body>
 </html>
+<script>
+    var config = {
+        basePath : '@Url.Content("~")/test.html';
+    }
+</script>

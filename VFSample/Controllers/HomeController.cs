@@ -9,6 +9,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Diagnostics;
 using MyProgram;
+using System.Configuration;
+using YamlDotNet.Core.Tokens;
+using YamlDotNet.Serialization;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace VFSample.Controllers
 {
@@ -60,9 +65,92 @@ namespace VFSample.Controllers
 
             var myVal = list.FirstOrDefault(p => p.Equals(new ABC()));
 
+            UserData d = new UserData();
+            d.GetObject();
 
+            string strOriginalTemplate = @"<root>
+                                          <configuration>
+                                            <settings >
+                                              <MQConnections>
+                                                <default key = 'mqcon' value = 'host=local:port=80' />
+                                              </MQConnections>
+                                              <SQLConnections>
+                                                <default key = 'dbcon' value = 'server=localhost;database=db;user=;pwd=' />
+                                              </SQLConnections>
+                                              <GRPCConnections>
+                                              </GRPCConnections>
+                                            </settings>
+                                          </configuration>
+                                        </root> ";
+
+            string strUseremplate = @"<root>
+                                          <configuration>
+	                                        <settings>
+	                                          <SQLConnections>
+	                                            <devconnection key='devdbcon' value='server=localhost;database=db;user=;pwd='/>
+	                                          </SQLConnections>
+	                                          <GRPCConnections>
+                                                    <devgrpc key='grpcone' value='server=grone'/>
+	                                          </GRPCConnections>
+	                                        </settings>
+                                          </configuration>
+                                        </root>";
+            strUseremplate = string.Empty;
+            XDocument mainDoc = null, uDoc = null;
+            try
+            {
+                mainDoc = XDocument.Parse(strOriginalTemplate);
+                uDoc = XDocument.Parse(string.IsNullOrEmpty(strUseremplate)?"<root/>":strUseremplate);
+            }
+            catch(Exception e)
+            {
+                
+            }
+            MergeElements(mainDoc?.Root, uDoc?.Root);
+            var merged = mainDoc.Root.ToString();
             return View("IndexTable", JsonSerializer.Deserialize<GeoModalData>(fl));
         }
+
+        private void MergeElements(XElement parentA, XElement parentB)
+        {
+           
+            foreach (XElement childB in parentB.DescendantNodes())
+            {
+                //check the same element exists in the user template 
+                // merge childB with first equivalent childA
+                // equivalent childB1, childB2,.. will be combined
+                //
+                bool isMatchFound = false;
+                foreach (XElement childA in parentA.Descendants())
+                {
+                    if (AreEquivalent(childA, childB))
+                    {
+                        MergeElements(childA, childB);
+                        isMatchFound = true;
+                        break;
+                    }
+                }
+
+                // if there is no equivalent childA, add childB into parentA
+                //
+                if (!isMatchFound) parentA.Add(childB);
+            }
+        }
+
+        // determine which elements we consider the same
+        //
+        private static bool AreEquivalent(XElement a, XElement b)
+        {
+            if (a.Name != b.Name) return false;
+            if (!a.HasAttributes && !b.HasAttributes) return true;
+            if (!a.HasAttributes || !b.HasAttributes) return false;
+            if (a.Attributes().Count() != b.Attributes().Count()) return false;
+
+            return a.Attributes().All(attA => b.Attributes(attA.Name)
+                .Count(attB => attB.Value == attA.Value) != 0);
+        }
+
+
         public IActionResult DataTable()
         {
             
